@@ -1,7 +1,6 @@
 import random
 import sys
-from cgitb import text
-from tkinter import font
+import online_setup 
 
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
