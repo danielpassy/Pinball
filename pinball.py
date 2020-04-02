@@ -1,7 +1,9 @@
+############### Dependências locais
 import random
 import sys
-from save_match_text import save_game
+import Saving.postgreSQL as postgreSQL
 
+########## definições ##########
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 128)
@@ -9,12 +11,11 @@ BLACK = (0, 0, 0)
 RED = (255, 255, 0)
 VIOLET = (0, 0, 255)
 
+########## Dependências Externas ##########
 import pygame
 
+########## Global variables ##########
 global win, X, Y
-
-
-# Cria tela
 
 
 class Player:
@@ -60,10 +61,6 @@ class Player:
     def addScore(self):
         self.score += 1
 
-        pass
-        # pontuacao += 1
-        # TODO: fazer o esquema da pontuacao
-
     def update(self):
         if self.PlayerNumber == 1:
             pygame.draw.line(win, (0, 0, 255), (self.XY_player[0], self.XY_player[1]),
@@ -104,20 +101,14 @@ class Ball:
             if (p1[1] < self.currentPosition[1] < p1[1] + size) and (
                     p1[0] - 2 < self.currentPosition[0] - self.radii < (
                     p1[0] - self.velocidadexy[0] * self.debugTheBallInt)):
-                print(("a fodelança é {}".format(self.velocidadexy[0] * self.debugTheBallInt)))
                 self.velocidadexy[0] = -self.velocidadexy[0]
-                print("CARALHOU")
-                print(self.velocidadexy[0])
                 self.securecontrol = 1
 
-        # TODO: receive position array and check if is the same as the ball
         # p2
         if self.securecontrol != 2:
             if (p2[1] - 2 < self.currentPosition[1] < p2[1] + size) and (
                     p2[0] < self.currentPosition[0] + self.radii < p2[0] + self.velocidadexy[0] * self.debugTheBallInt):
-                print(("a fodelança é {}".format(self.velocidadexy[0] * self.debugTheBallInt)))
                 self.velocidadexy[0] = -self.velocidadexy[0]
-                print("CARALHOU2")
                 self.securecontrol = 2
 
     def checkifOver(self):
@@ -135,14 +126,9 @@ class Ball:
                             self.currentPosition[1] + int(self.debugTheBallInt * self.velocidadexy[1])), 10, 0)
         self.currentPosition = [self.currentPosition[0] + int(self.debugTheBallInt * self.velocidadexy[0]),
                                 self.currentPosition[1] + int(self.debugTheBallInt * self.velocidadexy[1])]
-    #     self.i = 0
-    # else:
-    #     self.i += 1
-    #     pygame.draw.circle(win, (255, 0, 0),
-    #                        (self.currentposition[0], self.currentposition[1]), 10, 0)
-    # pass
 
 
+### renova a tela frame a frame
 def update(player1, player2, bola, clock, score_render_wrapper):
     win.fill((0, 0, 0))
 
@@ -158,15 +144,17 @@ def update(player1, player2, bola, clock, score_render_wrapper):
 
 ### MAIN, obviously, criação de objetos.
 def game():
-    #setup
-    pygame.init()
     global win
     global X
     global Y
+
+    # setup da tela
+    pygame.init()
     X = 800
     Y = 600
     win = pygame.display.set_mode((X, Y))
-    # score utility
+
+    # initializa o placar
     score_render_wrapper = [0, 0, 0]
     score_render_wrapper[2] = pygame.font.Font('freesansbold.ttf', 32)
     score_render_wrapper[0] = score_render_wrapper[2].render("P1: 0    P2: 0",
@@ -179,10 +167,11 @@ def game():
     player1 = Player(1)
     player2 = Player(2)
     bola = Ball()
+
     ### Main game loop
     while 1:
 
-        # ball dinamyc controller
+        #### CONTROLA A BOLA
         bola.checkIfbounces(player1.XY_player, player2.XY_player, Player.y_player_size)
         status = bola.checkifOver()
         if status:
@@ -195,7 +184,7 @@ def game():
                 del bola
                 bola = Ball()
 
-        # control over player
+        #### recebe comando dos palyers
         state = pygame.key.get_pressed()
         if state[pygame.K_DOWN]:
             player2.mov_down()
@@ -214,9 +203,12 @@ def game():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYUP:
-                if(event.key == pygame.K_k):
-                    print("olar")
-                    save_game(player1.XY_player[0], player2.XY_player[0], bola.currentPosition, bola.velocidadexy)
+                ############## K SALVA O JOGO, AINDA NÃO SAQUEI COMO SALVA COM DUAS TECLAS AO MSM TEMPO KKKKKK ########
+                if (event.key == pygame.K_k):
+                    save = postgreSQL.generate_save_file(player1.XY_player[0], player2.XY_player[0],
+                                                         bola.currentPosition, bola.velocidadexy)
+                    postgreSQL.save_file(save)
+
         ### update screen
         update(player1, player2, bola, Clocker, score_render_wrapper)
         pygame.display.update()
