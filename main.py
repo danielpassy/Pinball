@@ -1,0 +1,2 @@
+import pinball
+pinball.game()

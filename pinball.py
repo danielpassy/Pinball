@@ -1,6 +1,6 @@
 import random
 import sys
-import online_setup 
+from save_match_text import save_game
 
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
@@ -11,25 +11,7 @@ VIOLET = (0, 0, 255)
 
 import pygame
 
-global win
-
-
-def setup():
-    pygame.init()
-    global win
-    global X
-    global Y
-    X = 800
-    Y = 600
-    win = pygame.display.set_mode((X, Y))
-    # score utility
-    score_render_wrapper = [0, 0, 0]
-    score_render_wrapper[2] = pygame.font.Font('freesansbold.ttf', 32)
-    score_render_wrapper[0] = score_render_wrapper[2].render("P1: 0    P2: 0",
-                                                             True, GREEN, BLACK)
-    score_render_wrapper[1] = score_render_wrapper[0].get_rect()
-    score_render_wrapper[1].center = (X // 2, 16)
-    return win, score_render_wrapper
+global win, X, Y
 
 
 # Cria tela
@@ -37,7 +19,7 @@ def setup():
 
 class Player:
     global win
-    YSize_player = 100
+    y_player_size = 100
     t = 5  # thickness
     XY_player = [0, 0]
     V_player = 7
@@ -45,21 +27,21 @@ class Player:
     def __init__(self, Player_Number):
         self.score = 0
 
-        if (Player_Number == 1):
+        if Player_Number == 1:
             self.PlayerNumber = 1
-            pygame.draw.line(win, VIOLET, (self.t + 1, 250), (self.t + 1, 250 + self.YSize_player),
+            pygame.draw.line(win, VIOLET, (self.t + 1, 250), (self.t + 1, 250 + self.y_player_size),
                              self.t)
             self.XY_player = [self.t + 1, 250]
         else:
             self.PlayerNumber = 0
             pygame.draw.line(win, BLUE, (X - (self.t + 1), 250),
-                             (X - (self.t + 1), 250 + self.YSize_player), self.t)
+                             (X - (self.t + 1), 250 + self.y_player_size), self.t)
             self.XY_player = [X - (self.t + 1), 250]
 
     # Write here the position, the rendering, the score
 
     def mov_down(self):
-        if self.XY_player[1] > Y - self.YSize_player:
+        if self.XY_player[1] > Y - self.y_player_size:
             return
         self.XY_player = [self.XY_player[0], self.XY_player[1] + self.V_player]
 
@@ -68,6 +50,7 @@ class Player:
             return
         self.XY_player = [self.XY_player[0], self.XY_player[1] - self.V_player]
 
+    @property
     def getPosition(self):
         return self.XY_player
 
@@ -82,12 +65,12 @@ class Player:
         # TODO: fazer o esquema da pontuacao
 
     def update(self):
-        if (self.PlayerNumber == 1):
+        if self.PlayerNumber == 1:
             pygame.draw.line(win, (0, 0, 255), (self.XY_player[0], self.XY_player[1]),
-                             (self.XY_player[0], self.XY_player[1] + self.YSize_player), self.t)
-        elif (self.PlayerNumber == 0):
+                             (self.XY_player[0], self.XY_player[1] + self.y_player_size), self.t)
+        elif self.PlayerNumber == 0:
             pygame.draw.line(win, (200, 0, 255), (self.XY_player[0], self.XY_player[1]),
-                             (self.XY_player[0], self.XY_player[1] + self.YSize_player), self.t)
+                             (self.XY_player[0], self.XY_player[1] + self.y_player_size), self.t)
         self.getScore()
 
 
@@ -108,12 +91,12 @@ class Ball:
 
     def checkIfbounces(self, p1, p2, size):
         # top bounce
-        if (self.currentPosition[1] + self.radii < 0):
+        if self.currentPosition[1] + self.radii < 0:
             self.currentPosition = [self.currentPosition[0], self.currentPosition[1] + self.radii + 2]
             self.velocidadexy[1] = -self.velocidadexy[1]
 
         # bottom
-        if (self.currentPosition[1] + self.radii > 600):
+        if self.currentPosition[1] + self.radii > 600:
             self.currentPosition = [self.currentPosition[0], 600 - self.radii]
             self.velocidadexy[1] = - self.velocidadexy[1]
         # p1
@@ -160,48 +143,59 @@ class Ball:
     # pass
 
 
-class controle():
-    def atualizar(self, player1, player2, bola, clock, score_render_wrapper):
-        win.fill((0, 0, 0))
+def update(player1, player2, bola, clock, score_render_wrapper):
+    win.fill((0, 0, 0))
 
-        score_render_wrapper[0] = score_render_wrapper[2].render(
-            "P1: {}    P2: {}".format(player1.getScore(), player2.getScore()),
-            True, GREEN, BLACK)
-        win.blit(score_render_wrapper[0], score_render_wrapper[1])
-        player1.update()
-        player2.update()
-        bola.update()
-        clock.tick(60)
-
-        # TODO: add more funcionalities
+    score_render_wrapper[0] = score_render_wrapper[2].render(
+        "P1: {}    P2: {}".format(player1.getScore(), player2.getScore()),
+        True, GREEN, BLACK)
+    win.blit(score_render_wrapper[0], score_render_wrapper[1])
+    player1.update()
+    player2.update()
+    bola.update()
+    clock.tick(60)
 
 
 ### MAIN, obviously, criação de objetos.
-def main():
-    win, score_render_wrapper = setup()
+def game():
+    #setup
+    pygame.init()
+    global win
+    global X
+    global Y
+    X = 800
+    Y = 600
+    win = pygame.display.set_mode((X, Y))
+    # score utility
+    score_render_wrapper = [0, 0, 0]
+    score_render_wrapper[2] = pygame.font.Font('freesansbold.ttf', 32)
+    score_render_wrapper[0] = score_render_wrapper[2].render("P1: 0    P2: 0",
+                                                             True, GREEN, BLACK)
+    score_render_wrapper[1] = score_render_wrapper[0].get_rect()
+    score_render_wrapper[1].center = (X // 2, 16)
 
+    # Intialize objects
     Clocker = pygame.time.Clock()
     player1 = Player(1)
     player2 = Player(2)
     bola = Ball()
-    mastercontrol = controle()
     ### Main game loop
+    while 1:
 
-    # check posição da bola
-    while (1):
-        bola.checkIfbounces(player1.XY_player, player2.XY_player, Player.YSize_player)
+        # ball dinamyc controller
+        bola.checkIfbounces(player1.XY_player, player2.XY_player, Player.y_player_size)
         status = bola.checkifOver()
-        if (status != False):
-            if (status == "player1"):
+        if status:
+            if status == "player1":
                 player1.addScore()
                 del bola
                 bola = Ball()
-            elif (status == "player2"):
+            elif status == "player2":
                 player2.addScore()
                 del bola
                 bola = Ball()
 
-        # Check comando pressionado
+        # control over player
         state = pygame.key.get_pressed()
         if state[pygame.K_DOWN]:
             player2.mov_down()
@@ -211,6 +205,7 @@ def main():
             player1.mov_down()
         if state[pygame.K_w]:
             player1.mov_up()
+
         ### EXIT
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -218,10 +213,14 @@ def main():
                 pygame.display.quit()
                 pygame.quit()
                 sys.exit()
-
+            if event.type == pygame.KEYUP:
+                if(event.key == pygame.K_k):
+                    print("olar")
+                    save_game(player1.XY_player[0], player2.XY_player[0], bola.currentPosition, bola.velocidadexy)
         ### update screen
-        mastercontrol.atualizar(player1, player2, bola, Clocker, score_render_wrapper)
+        update(player1, player2, bola, Clocker, score_render_wrapper)
         pygame.display.update()
 
 
-main()
+if __name__ == "__main__":
+    game()
