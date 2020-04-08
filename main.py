@@ -1,2 +1,3 @@
-import pinball
+from src import pinball
+
 pinball.game()

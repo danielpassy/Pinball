@@ -1,7 +1,7 @@
 ############### Dependências locais
 import random
 import sys
-import Saving.postgreSQL as postgreSQL
+import src.postgreSQL as postgreSQL
 
 ########## definições ##########
 WHITE = (255, 255, 255)
@@ -209,6 +209,9 @@ def game():
                                                          bola.currentPosition, bola.velocidadexy)
                     postgreSQL.save_file(save)
 
+                if (event.key == pygame.K_l):
+                    player1.XY_player[1], player2.XY_player[1], bola.currentPosition[0], bola.currentPosition[1], \
+                    bola.velocidadexy[0], bola.velocidadexy[1] = postgreSQL.get_save_file()
         ### update screen
         update(player1, player2, bola, Clocker, score_render_wrapper)
         pygame.display.update()

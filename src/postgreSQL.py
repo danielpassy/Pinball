@@ -21,7 +21,7 @@ def save_file(save):
             host='localhost',
             database='pythonic',
             user='postgres',
-            password='pigento93')
+            password='123456')
 
         cursor = connection.cursor()
         cursor.execute(save)
@@ -47,7 +47,7 @@ def get_save_file():
             host='localhost',
             database='pythonic',
             user='postgres',
-            password='pigento93')
+            password='123456')
 
         # get the name list form the DB
         cursor = connection.cursor()
@@ -57,7 +57,7 @@ def get_save_file():
         # game_names = list(sum(game_names, ()))
         # print(game_names)
 
-        # Input wchich game user wants and try to match
+        # Input. which game user wants and try to match
         for i in game_names:
             print(game_names)
         try:
@@ -66,6 +66,7 @@ def get_save_file():
             cursor2 = connection.cursor()
             cursor2.execute(query)
             data = cursor2.fetchall()
+            print(data)
             print("deu certo")
             return data
         except IndexError:
