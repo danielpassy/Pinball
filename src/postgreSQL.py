@@ -17,11 +17,14 @@ def generate_save_file(P1, P2, bolaXY, bola_speed):
 # connect to the db, hopefully
 def save_file(save):
     try:
+        f = open('password.txt', 'r')
+        password = f.read()
         connection = psycopg2.connect(
             host='localhost',
             database='pythonic',
             user='postgres',
-            password='123456')
+            password=password)
+        # TODO: testar para ver se esta conexão funciona, verificando se gera o password corretamente
 
         cursor = connection.cursor()
         cursor.execute(save)
@@ -43,11 +46,13 @@ def save_file(save):
 
 def get_save_file():
     try:
+        f = open('password.txt', 'r')
+        password = f.read()
         connection = psycopg2.connect(
             host='localhost',
             database='pythonic',
             user='postgres',
-            password='123456')
+            password=password)
 
         # get the name list form the DB
         cursor = connection.cursor()
@@ -84,6 +89,7 @@ def get_save_file():
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
+
 
 if __name__ == '__main__':
     # save_file = generate_save_file(6, 794, [288, 268], [-0.7147161699707916, -0.22960815220284236])

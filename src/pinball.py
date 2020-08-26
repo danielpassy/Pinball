@@ -83,8 +83,9 @@ class Ball:
         pygame.draw.circle(win, (255, 0, 0), (400, 300), self.radii, 0)
         self.currentPosition = [400, 300]
         while True:
-            self.velocidadexy = [random.uniform(-1, 1), random.uniform(-1, 1)]
-            if abs(self.velocidadexy[1]) and abs(self.velocidadexy[0]) > 1 / self.debugTheBallInt: break
+            self.velocidadexy = [random.uniform(-0.7, 0.7), random.uniform(-0.7, 0.7)]
+            #todo checar que a cada componente da velocidade seja superior a uma velocidade mínima
+            if abs(self.velocidadexy[1]) and abs(self.velocidadexy[0]) > 5 / self.debugTheBallInt: break
 
     def checkIfbounces(self, p1, p2, size):
         # top bounce
@@ -192,6 +193,10 @@ def game():
             player2.mov_up()
         if state[pygame.K_s]:
             player1.mov_down()
+        if state[pygame.K_ESCAPE]:
+            pygame.draw.circle(win, (255, 25, 255),(300, 300), 50)
+            update(player1, player2, bola, Clocker, score_render_wrapper)
+            input("macasdasdasdarrah?")
         if state[pygame.K_w]:
             player1.mov_up()
 
